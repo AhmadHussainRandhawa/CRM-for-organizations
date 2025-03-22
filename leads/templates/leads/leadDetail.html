@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Details</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %} {% endblock title %}
+{% block content %}
+
     <h1>The details of {{lead.first_name}}</h1>
     {{lead}} <br>
     <p>The agent assigned to it is: {{lead.agent}}</p>
@@ -13,5 +10,4 @@
     <a href="{% url 'leads:leadEdit' lead.pk %}">Edit</a>
     <a href="{% url 'leads:leadDelete' lead.pk %}">Delete</a>
     
-</body>
-</html>
+{% endblock content %}

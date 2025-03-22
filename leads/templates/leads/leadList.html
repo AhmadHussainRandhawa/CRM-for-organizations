@@ -1,21 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .lead {
-            padding-top: 10px;
-            padding-bottom: 10px;
-            padding-left: 6px;
-            padding-right: 6px;
-            margin-top: 10px;
-            background-color: #f6f6f6;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %} {% endblock title %}
+{% block content %}
+
     <h1>Leads list</h1>
     {% for lead in leads %}
         <div class="lead">
@@ -23,5 +10,5 @@
         </div>
         {% endfor %}
     <a style="margin-top: 10px; display:block" href="{% url 'leads:leadCreate' %}">Create Lead</a>
-</body>
-</html>
+    
+{% endblock content %}
