@@ -8,6 +8,10 @@
 <body>
     <h1>The details of {{lead.first_name}}</h1>
     {{lead}} <br>
+    <p>The agent assigned to it is: {{lead.agent}}</p>
     <a href="{% url 'lead:leadList' %}" style="margin-top: 10px; display: block;">Go Back</a>
+    <a href="{% url 'leads:leadEdit' lead.pk %}">Edit</a>
+    <a href="{% url 'leads:leadDelete' lead.pk %}">Delete</a>
+    
 </body>
 </html>

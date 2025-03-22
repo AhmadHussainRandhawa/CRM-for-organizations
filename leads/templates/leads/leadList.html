@@ -22,5 +22,6 @@
             <a href="{% url 'lead:leadDetail' lead.id %}">{{lead.first_name}} {{lead.last_name}}</a> - Age: {{lead.age}}
         </div>
         {% endfor %}
+    <a style="margin-top: 10px; display:block" href="{% url 'leads:leadCreate' %}">Create Lead</a>
 </body>
 </html>
