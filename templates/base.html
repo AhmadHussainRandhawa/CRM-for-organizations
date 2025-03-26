@@ -18,6 +18,8 @@
 	{% tailwind_css %}
 </head>
 <body>
+    {% include 'navbar.html' %}
+
     {% block content %}  {% endblock content %}
 
   {% if settings.DEBUG %}

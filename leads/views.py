@@ -2,6 +2,11 @@ from django.shortcuts import render, redirect
 from .models import Lead, Agent
 from .forms import leadForm, leadModelForm
 
+
+def homePage(request):
+    return render(request, 'homePage.html')
+
+
 def leadList(request):
     leads = Lead.objects.all()
     context = {'leads': leads}

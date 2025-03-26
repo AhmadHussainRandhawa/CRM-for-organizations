@@ -3,6 +3,6 @@
     "concurrently": "^9.1.2"
   },
   "scripts": {
-    "dev": "concurrently 'python manage.py tailwind start' 'python manage.py runserver'"
+    "dev": "concurrently 'python manage.py tailwind start' 'python manage.py runserver 8001'"
   }
 }
