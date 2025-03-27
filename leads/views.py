@@ -1,7 +1,9 @@
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
 from .models import Lead
 from .forms import leadModelForm
 from django.views import generic
+
 
 # Class Based Views
 class HomePageView(generic.TemplateView):
@@ -27,6 +29,17 @@ class LeadCreateView(generic.CreateView):
     def get_success_url(self):
         return reverse('leads:leadList')
     
+    def form_valid(self, form):
+        send_mail(
+            subject="A lead has been Created",
+            message = "Now Go and check new leads",
+            from_email = 'HAmac@gmail.com',
+            recipient_list=['tesdsfc.rom'],
+        )
+
+        return super().form_valid(form)
+    
+    
 
 class LeadEditView(generic.UpdateView):
     template_name = 'leads/leadEdit.html'
@@ -47,7 +60,7 @@ class LeadDeleteView(generic.DeleteView):
 
 
 # Function based views:
-def homePage(request):
+"""def homePage(request):
     return render(request, 'homePage.html')
 
 def leadList(request):
@@ -93,47 +106,50 @@ def leadDelete(pk):
     lead = Lead.objects.get(id=pk)
     lead.delete()
     return redirect('leads:leadList')
+"""
 
-# def leadEdit(request, pk):
-#     lead = Lead.objects.get(id=pk)
-#     if request.method=='POST':
-#         form = leadModelForm(request.POST)
-#         if form.is_valid():
-#             first = form.cleaned_data['first_name']
-#             last = form.cleaned_data['last_name']
-#             age = form.cleaned_data['age']
-#             agent = form.cleaned_data['agent']
 
-#             lead.first_name = first
-#             lead.last_name = last
-#             lead.age = age
-#             lead.agent = agent
+"""def leadEdit(request, pk):
+    lead = Lead.objects.get(id=pk)
+    if request.method=='POST':
+        form = leadModelForm(request.POST)
+        if form.is_valid():
+            first = form.cleaned_data['first_name']
+            last = form.cleaned_data['last_name']
+            age = form.cleaned_data['age']
+            agent = form.cleaned_data['agent']
 
-#             lead.save()
-#             return redirect('leads:leadList')
+            lead.first_name = first
+            lead.last_name = last
+            lead.age = age
+            lead.agent = agent
 
-#     else: 
-#         form = leadModelForm(request.POST)
+            lead.save()
+            return redirect('leads:leadList')
+
+    else: 
+        form = leadModelForm(request.POST)
     
-#     context = {'lead':lead, 'form': form}
+    context = {'lead':lead, 'form': form}
     
-#     return render(request, 'leads/leadEdit.html', context)
+    return render(request, 'leads/leadEdit.html', context)
 
 
-# def leadCreate(request):
-#     if request.method=="POST":
-#         form = leadForm(request.POST)
-#         if form.is_valid():
-#             first = form.cleaned_data['first_name']
-#             last = form.cleaned_data['last_name']
-#             age = form.cleaned_data['age']
-#             agent = Agent.objects.get(id=2)
-#             Lead.objects.create(first_name=first, last_name=last, age=age, agent=agent)
-#             return redirect('leads:leadList')
+def leadCreate(request):
+    if request.method=="POST":
+        form = leadForm(request.POST)
+        if form.is_valid():
+            first = form.cleaned_data['first_name']
+            last = form.cleaned_data['last_name']
+            age = form.cleaned_data['age']
+            agent = Agent.objects.get(id=2)
+            Lead.objects.create(first_name=first, last_name=last, age=age, agent=agent)
+            return redirect('leads:leadList')
                 
-#     else:
-#         form = leadForm()
+    else:
+        form = leadForm()
 
-#     context = {'form': form}
+    context = {'form': form}
 
-#     return render(request, 'leads/leadCreate.html', context)
+    return render(request, 'leads/leadCreate.html', context)
+"""
