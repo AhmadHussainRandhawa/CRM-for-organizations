@@ -1,0 +1,11 @@
+{% block content %} 
+
+<h1>Are You sure you want to delete?</h1>
+<form method='post' action=".">
+    {% csrf_token %}
+    {{form.as_p}}
+    <a href="{% url 'leads:leadList' %}">No</a>
+    <button type='submit'>Yes</button>
+</form>
+
+{% endblock content %}

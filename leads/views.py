@@ -1,20 +1,65 @@
-from django.shortcuts import render, redirect
-from .models import Lead, Agent
-from .forms import leadForm, leadModelForm
+from django.shortcuts import render, redirect, reverse
+from .models import Lead
+from .forms import leadModelForm
+from django.views import generic
+
+# Class Based Views
+class HomePageView(generic.TemplateView):
+    template_name = 'homePage.html'
 
 
+class LeadListView(generic.ListView):
+    template_name = 'leads/leadList.html'
+    queryset = Lead.objects.all()
+    context_object_name = 'leads'
+
+
+class LeadDetailView(generic.DetailView):
+    template_name = 'leads/leadDetail.html'
+    queryset = Lead.objects.all()
+    context_object_name = 'lead'
+
+
+class LeadCreateView(generic.CreateView):
+    template_name = 'leads/leadCreate.html'
+    form_class = leadModelForm
+    
+    def get_success_url(self):
+        return reverse('leads:leadList')
+    
+
+class LeadEditView(generic.UpdateView):
+    template_name = 'leads/leadEdit.html'
+    queryset = Lead.objects.all()
+    form_class = leadModelForm
+
+    def get_success_url(self):
+        return reverse('leads:leadList')
+    
+
+class LeadDeleteView(generic.DeleteView):
+    template_name = 'leads/leadDelete.html'
+    queryset = Lead.objects.all()
+
+    def get_success_url(self):
+        return reverse('leads:leadList')
+    
+
+
+# Function based views:
 def homePage(request):
     return render(request, 'homePage.html')
-
 
 def leadList(request):
     leads = Lead.objects.all()
     context = {'leads': leads}
+
     return render(request, 'leads/leadList.html', context)
 
 def leadDetail(request, pk):
     lead = Lead.objects.get(id=pk)
     context = {'lead': lead}
+
     return render(request, 'leads/leadDetail.html', context)
 
 def leadCreate(request):
@@ -27,29 +72,27 @@ def leadCreate(request):
     else: 
         form = leadModelForm()
     
-    return render(request, 'leads/leadCreate.html', {'form':form})
-
-
+    context = {'form':form}
+    return render(request, 'leads/leadCreate.html', context)
+    
 def leadEdit(request, pk):
     lead = Lead.objects.get(id=pk)
-    if request.method == 'POST':
-        form = leadModelForm(request.POST, instance=lead)
+    if request.method=='POST':
+        form = leadModelForm(request.POST, instance=lead)   # It add new data in the previous lead
         if form.is_valid():
             form.save()
             return redirect('leads:leadList')
-
-    else:
-        form = leadModelForm(instance=lead)
-
+    else: 
+        form = leadModelForm(instance=lead)     # It shows the previous data of a lead
+    
     context = {'form':form, 'lead':lead}
     return render(request, 'leads/leadEdit.html', context)
+    
 
-
-def leadDelete(request, pk):
+def leadDelete(pk):
     lead = Lead.objects.get(id=pk)
     lead.delete()
     return redirect('leads:leadList')
-
 
 # def leadEdit(request, pk):
 #     lead = Lead.objects.get(id=pk)
