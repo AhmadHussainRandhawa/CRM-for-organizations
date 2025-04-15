@@ -3,26 +3,26 @@ from django.shortcuts import render, redirect, reverse
 from .models import Lead
 from .forms import leadModelForm, CustomUserCreationForm
 from django.views import generic
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Class Based Views
 class HomePageView(generic.TemplateView):
     template_name = 'homePage.html'
 
 
-class LeadListView(generic.ListView):
+class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = 'leads/leadList.html'
     queryset = Lead.objects.all()
     context_object_name = 'leads'
 
 
-class LeadDetailView(generic.DetailView):
+class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'leads/leadDetail.html'
     queryset = Lead.objects.all()
     context_object_name = 'lead'
 
 
-class LeadCreateView(generic.CreateView):
+class LeadCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'leads/leadCreate.html'
     form_class = leadModelForm
     
@@ -42,7 +42,7 @@ class LeadCreateView(generic.CreateView):
     
     
 
-class LeadEditView(generic.UpdateView):
+class LeadEditView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'leads/leadEdit.html'
     queryset = Lead.objects.all()
     form_class = leadModelForm
@@ -51,7 +51,7 @@ class LeadEditView(generic.UpdateView):
         return reverse('leads:leadList')
     
 
-class LeadDeleteView(generic.DeleteView):
+class LeadDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = 'leads/leadDelete.html'
     queryset = Lead.objects.all()
 
