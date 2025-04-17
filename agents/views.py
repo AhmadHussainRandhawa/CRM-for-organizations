@@ -3,16 +3,18 @@ from django.views import generic
 from leads.models import Agent
 from .forms import AgentModelForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .mixins import OrganizationAndLoginRequiredMixin
 
-class AgentListView(LoginRequiredMixin, generic.ListView):
+
+class AgentListView(OrganizationAndLoginRequiredMixin, generic.ListView):
     template_name = 'agents/agentList.html'
     context_object_name = 'agents'
 
     def get_queryset(self):
-        return Agent.objects.all()
+        return Agent.objects.filter(organization=self.request.user.userprofile)
 
 
-class AgentCreateView(LoginRequiredMixin, generic.CreateView):
+class AgentCreateView(OrganizationAndLoginRequiredMixin, generic.CreateView):
     template_name = 'agents/agentCreate.html'
     form_class = AgentModelForm
 
@@ -27,15 +29,15 @@ class AgentCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
     
 
-class AgentDetailView(LoginRequiredMixin, generic.DetailView):
+class AgentDetailView(OrganizationAndLoginRequiredMixin, generic.DetailView):
     template_name = 'agents/agentDetail.html'
     context_object_name = 'agent'
 
     def get_queryset(self):
-        return Agent.objects.all()
+        return Agent.objects.filter(organization=self.request.user.userprofile)
     
 
-class AgentUpdateView(LoginRequiredMixin, generic.UpdateView):
+class AgentUpdateView(OrganizationAndLoginRequiredMixin, generic.UpdateView):
     template_name = 'agents/agentUpdate.html'
     form_class = AgentModelForm
     context_object_name = 'agent'
@@ -44,14 +46,14 @@ class AgentUpdateView(LoginRequiredMixin, generic.UpdateView):
         return reverse('agents:agentList')
 
     def get_queryset(self):
-        return Agent.objects.all()
+        return Agent.objects.filter(organization=self.request.user.userprofile)
 
 
-class AgentDeleteView(LoginRequiredMixin, generic.DeleteView):
+class AgentDeleteView(OrganizationAndLoginRequiredMixin, generic.DeleteView):
     template_name = 'agents/agentDelete.html'
 
     def get_queryset(self):
-        return Agent.objects.all()
+        return Agent.objects.filter(organization=self.request.user.userprofile)
     
     def get_success_url(self):
         return reverse('agents:agentList')
