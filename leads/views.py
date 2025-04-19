@@ -14,9 +14,17 @@ class HomePageView(generic.TemplateView):
 
 class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = 'leads/leadList.html'
-    queryset = Lead.objects.all()
     context_object_name = 'leads'
 
+    def get_queryset(self):
+        if self.request.user.is_organizer:
+            queryset = Lead.objects.filter(organization=self.request.user.userprofile)
+        else:
+            queryset = Lead.objects.filter(organization=self.request.user.agent.organization)
+            # Filter for the agent that is logged in.
+            queryset = queryset.filter(agent_user=self.request.user)
+        return queryset
+            
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'leads/leadDetail.html'
@@ -46,19 +54,24 @@ class LeadCreateView(OrganizationAndLoginRequiredMixin, generic.CreateView):
 
 class LeadEditView(OrganizationAndLoginRequiredMixin, generic.UpdateView):
     template_name = 'leads/leadEdit.html'
-    queryset = Lead.objects.all()
     form_class = leadModelForm
 
     def get_success_url(self):
         return reverse('leads:leadList')
     
+    def get_queryset(self):
+        return Lead.objects.filter(organization=self.request.user.userprofile)
+
 
 class LeadDeleteView(OrganizationAndLoginRequiredMixin, generic.DeleteView):
     template_name = 'leads/leadDelete.html'
-    queryset = Lead.objects.all()
 
     def get_success_url(self):
         return reverse('leads:leadList')
+    
+
+    def get_queryset(self):
+        return Lead.objects.filter(organization=self.request.user.userprofile)
     
 
 class SignupView(generic.CreateView):
