@@ -5,60 +5,6 @@ from .forms import leadModelForm, CustomUserCreationForm
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from agents.mixins import OrganizationAndLoginRequiredMixin
-
-import logging
-from django.contrib.auth import get_user_model, logout
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.contrib.auth.forms import SetPasswordForm
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-
-logger = logging.getLogger(__name__)
-User = get_user_model()
-
-class DebugPasswordResetConfirmView(PasswordResetConfirmView):
-    form_class = SetPasswordForm
-    success_url = reverse_lazy('password_reset_complete')
-
-    def dispatch(self, *args, **kwargs):
-        logger.info("👉 dispatch() called with kwargs: %s", kwargs)
-        self.validlink = False
-        self.user = None
-
-        uidb64 = kwargs.get('uidb64')
-        token = kwargs.get('token')
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            self.user = User.objects.get(pk=uid)
-            logger.info("✅ User found: %s", self.user)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            logger.warning("⚠️ UID decoding failed or user not found.")
-
-        if self.user is not None and default_token_generator.check_token(self.user, token):
-            self.validlink = True
-        else:
-            logger.warning("⚠️ Invalid token for user.")
-
-        return super().dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        logger.info("💡 form_valid reached. new_password1=%r", form.cleaned_data.get('new_password1'))
-
-        form.save()  # Save new password
-        logger.info("  ▶️ password hash after save: %r", self.user.password)
-
-        # Instead of calling super().form_valid(form), we manually do everything
-        logout(self.request)
-        logger.info("🔒 logged out old session after password reset")
-
-        return redirect(self.success_url)
-
-    def form_invalid(self, form):
-        logger.warning("⚠️ form_invalid: %s", form.errors)
-        return super().form_invalid(form)
     
 
 # Class Based Views
@@ -72,13 +18,23 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         if self.request.user.is_organizer:
-            queryset = Lead.objects.filter(organization=self.request.user.userprofile)
+            queryset = Lead.objects.filter(organization=self.request.user.userprofile, agent__isnull=True)
         else:
             queryset = Lead.objects.filter(organization=self.request.user.agent.organization)
             # Filter for the agent that is logged in.
             queryset = queryset.filter(agent__user=self.request.user)
         return queryset
-            
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        if user.is_organizer:
+            queryset = Lead.objects.filter(organization=user.userprofile, agent__isnull=True)
+            context.update({'unassigned_leads': queryset})
+        
+        return context
+    
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'leads/leadDetail.html'
