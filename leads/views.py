@@ -18,7 +18,7 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         if self.request.user.is_organizer:
-            queryset = Lead.objects.filter(organization=self.request.user.userprofile, agent__isnull=True)
+            queryset = Lead.objects.filter(organization=self.request.user.userprofile, agent__isnull=False)
         else:
             queryset = Lead.objects.filter(organization=self.request.user.agent.organization)
             # Filter for the agent that is logged in.
