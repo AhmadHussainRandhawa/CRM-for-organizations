@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
 from .models import Lead
-from .forms import leadModelForm, CustomUserCreationForm
+from .forms import leadModelForm, CustomUserCreationForm, AssignAgentForm
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from agents.mixins import OrganizationAndLoginRequiredMixin
@@ -92,6 +92,26 @@ class SignupView(generic.CreateView):
         return reverse('login')
 
 
+class AssignAgentView(OrganizationAndLoginRequiredMixin, generic.FormView):
+    template_name = 'leads/assignAgent.html'
+    form_class = AssignAgentForm
+
+    def get_success_url(self):
+        return reverse('lead:leadList')
+        
+    def get_form_kwargs(self, **kwargs):
+        kwargs = super().get_form_kwargs(**kwargs)
+        kwargs.update({'request':self.request})
+        return kwargs
+
+    def form_valid(self, form):
+        agent = form.cleaned_data['agent']
+        lead = Lead.objects.get(id=self.kwargs['pk'])
+        lead.agent = agent
+        lead.save()
+
+        return super().form_valid(form)
+        
 
 # Function based views:
 """def homePage(request):
