@@ -9,7 +9,8 @@
     
     <div class='w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200'>
       <div>
-        <h1 class='text-4xl text-gray-800'>Assigned Leads</h1>
+        <h1 class='text-4xl text-gray-800 mb-3'>Assigned Leads</h1>
+        <a class='text-gray-800 hover:text-blue-500' href="{% url 'lead:categoryList' %}">Categories of leads</a>
       </div>    
       {% if request.user.is_organizer %}     
       <div>

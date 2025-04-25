@@ -134,6 +134,28 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
         return context
     
 
+class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
+    template_name = 'leads/categoryDetail.html'
+    context_object_name = 'category'
+
+    def get_queryset(self):
+        if self.request.user.is_organizer:
+            queryset = Category.objects.filter(organization=self.request.user.userprofile)
+        else:
+            queryset = Category.objects.filter(organization=self.request.user.agent.organization)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # / self.get_object().lead_set.all()
+        lead = Lead.objects.filter(category=self.get_object())  
+        context.update({'leads':lead})
+        return context
+
+
+
+
 # Function based views:
 """def homePage(request):
     return render(request, 'homePage.html')
