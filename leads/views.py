@@ -60,7 +60,6 @@ class LeadCreateView(OrganizationAndLoginRequiredMixin, generic.CreateView):
 
         return super().form_valid(form)
     
-    
 
 class LeadEditView(OrganizationAndLoginRequiredMixin, generic.UpdateView):
     template_name = 'leads/leadEdit.html'
@@ -111,7 +110,18 @@ class AssignAgentView(OrganizationAndLoginRequiredMixin, generic.FormView):
         lead.save()
 
         return super().form_valid(form)
+
         
+class CategoryListView(LoginRequiredMixin, generic.ListView):
+    template_name = 'leads/categoryList.html'
+
+    def get_queryset(self):
+        
+        if self.request.is_organizer:
+            queryset = Category.objects.filter(organization=self.request.user.userprofile)
+        else:
+            queryset = Category.objects.filter(organization=self.request.user.agent.organization)
+            
 
 # Function based views:
 """def homePage(request):
