@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse
-from .models import Lead
+from .models import Lead, Category
 from .forms import leadModelForm, CustomUserCreationForm, AssignAgentForm
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -114,14 +114,25 @@ class AssignAgentView(OrganizationAndLoginRequiredMixin, generic.FormView):
         
 class CategoryListView(LoginRequiredMixin, generic.ListView):
     template_name = 'leads/categoryList.html'
+    context_object_name = 'categories'
 
     def get_queryset(self):
         
-        if self.request.is_organizer:
+        if self.request.user.is_organizer:
             queryset = Category.objects.filter(organization=self.request.user.userprofile)
         else:
             queryset = Category.objects.filter(organization=self.request.user.agent.organization)
-            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        if user.is_organizer:
+            queryset = Lead.objects.filter(organization=user.userprofile)
+            context.update({'unassigned_leads_count':queryset.filter(category__isnull=True).count()})
+        return context
+    
 
 # Function based views:
 """def homePage(request):
